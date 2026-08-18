@@ -70,7 +70,7 @@ def add_signal(request: SignalRequest):
                 stop_loss,
                 take_profit
             )
-            VALUES (?, ?, ?, ?, ?)
+            VALUES (%s, %s, %s, %s, %s)
             """,
             (
                 request.symbol,

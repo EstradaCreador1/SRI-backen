@@ -71,6 +71,7 @@ def add_signal(request: SignalRequest):
                 take_profit
             )
             VALUES (%s, %s, %s, %s, %s)
+            RETURNING id
             """,
             (
                 request.symbol,
@@ -80,8 +81,8 @@ def add_signal(request: SignalRequest):
                 request.take_profit,
             ),
         )
-        connection.commit()
-        signal_id = cursor.lastrowid
+
+        signal_id = cursor.fetchone()["id"]
 
         row = connection.execute(
             """
@@ -94,12 +95,15 @@ def add_signal(request: SignalRequest):
                 take_profit,
                 created_at
             FROM signals
-            WHERE id = ?
+            WHERE id = %s
             """,
             (signal_id,),
         ).fetchone()
 
+        connection.commit()
+
     return {
         "success": True,
-        "signal": dict(row),
+        "signal": row,
     }
+    
